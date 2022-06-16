@@ -26,8 +26,17 @@
                 android:id="@+id/buttonOffer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:text="Offer a ride" />
+
+            <Button
+                android:id="@+id/buttonViewAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:text="View all" />
 
             <Button
                 android:id="@+id/buttonFind"
@@ -103,8 +112,15 @@
             android:id="@+id/textViewResultMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Result"
             android:textSize="20sp" />
+
+        <ListView
+            android:id="@+id/listViewRides"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

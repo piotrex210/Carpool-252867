@@ -14,6 +14,7 @@ import android.widget.TimePicker
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.carpool_252867.databinding.ActivityMainBinding
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.*
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         var selectedDateText  = formatDate.format(myCalendar.time)//= formatDate.format(myCalendar.time)
         var selectedDate = myCalendar.time
         var currentDate = myCalendar.time
+        var selectedTime = ""
 
         binding.buttonDate.setOnClickListener {
             val datePicker = DatePickerDialog.OnDateSetListener { view, currentYear, currentMonth, currentDay ->
@@ -65,6 +67,9 @@ class MainActivity : AppCompatActivity() {
             }
             val dpd = DatePickerDialog(this, datePicker, selectedYear, selectedMonth, selectedDay)
             dpd.datePicker.minDate = System.currentTimeMillis() - 1000 // ustawianie minimalnej daty do wybrania
+            var yearInMilis: Long = 1000*60
+            yearInMilis *= 60*24*365
+            dpd.datePicker.maxDate = System.currentTimeMillis() + yearInMilis // ustawienie maksymalnej daty do wybrania na + rok
             dpd.show()
         }
 
@@ -74,10 +79,25 @@ class MainActivity : AppCompatActivity() {
                myCalendar.set(Calendar.MINUTE, currentMinute)
                selectedHour = myCalendar.get(Calendar.HOUR_OF_DAY)
                selectedMinute = myCalendar.get(Calendar.MINUTE)
+               selectedTime = "$selectedHour:$selectedMinute"
            }, selectedHour, selectedMinute, true ).show()
         }
 
+        binding.editTextTextStartPoint.setOnClickListener {
+
+        }
+
         binding.buttonOffer.setOnClickListener {
+
+            try {
+                val rideModel:RideModel = RideModel(-1, binding.editTextTextStartPoint.text.toString(), binding.editTextTextDestinationPoint.text.toString(),
+                selectedDate, selectedTime, Integer.parseInt(binding.editTextTextPassengersNumber.text.toString()),
+                    Integer.parseInt(binding.editTextTextPricePerPassenger.text.toString()))
+                binding.textViewResultMessage.text = rideModel.toString()
+            }
+            catch (e: Exception){
+                Toast.makeText(applicationContext, "Error during creating RideModel!", Toast.LENGTH_LONG)
+            }
             var message = ""
             if (binding.editTextTextStartPoint.text.isNotEmpty()){
                 message += "Start point: " + binding.editTextTextStartPoint.text + "\n"
@@ -86,20 +106,54 @@ class MainActivity : AppCompatActivity() {
                 message += "Destination point: " + binding.editTextTextDestinationPoint.text + "\n"
             }
             message += "DateText: $selectedDateText \n"
-            message += "Date values : $selectedYear $selectedMonth $selectedDay \n"
-
-            message += "Current Date: $currentDateText \n"
-            message += "Selected date is after current day: " + selectedDate.compareTo(currentDate) + "\n"
-
+            //message += "Date values : $selectedYear $selectedMonth $selectedDay \n"
+            //message += "Current Date: $currentDateText \n"
+            //message += "Selected date is after current day: " + selectedDate.compareTo(currentDate) + "\n"
             if(selectedDate.equals(currentDate) && (selectedHour < currentHour || (selectedHour == currentHour && selectedMinute < currentMinute))){
                 // wybrano czas przed aktualną chwilą
                 Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()
                 binding.buttonTime.setBackgroundColor(Color.RED)
+                binding.buttonDate.setBackgroundColor(Color.RED)
             }
             else{
                 message += "Time: $selectedHour:$selectedMinute \n"
+                binding.buttonTime.setBackgroundColor(Color.parseColor("#6200ee"))
+                binding.buttonDate.setBackgroundColor(Color.parseColor("#6200ee"))
             }
-            message += "Current Time: $currentHour:$currentMinute \n"
+            //message += "Current Time: $currentHour:$currentMinute \n"
+            if (binding.editTextTextPassengersNumber.text.isNotEmpty()){
+                message += "Passengers number: " + binding.editTextTextPassengersNumber.text + "\n"
+            }
+            if (binding.editTextTextPricePerPassenger.text.isNotEmpty()){
+                message += "Price per passenger: " + binding.editTextTextPricePerPassenger.text + "\n"
+            }
+            //binding.textViewResultMessage.text = message;
+        }
+
+        binding.buttonFind.setOnClickListener {
+            var message = ""
+            if (binding.editTextTextStartPoint.text.isNotEmpty()){
+                message += "Start point: " + binding.editTextTextStartPoint.text + "\n"
+            }
+            if (binding.editTextTextDestinationPoint.text.isNotEmpty()){
+                message += "Destination point: " + binding.editTextTextDestinationPoint.text + "\n"
+            }
+            message += "DateText: $selectedDateText \n"
+            //message += "Date values : $selectedYear $selectedMonth $selectedDay \n"
+            //message += "Current Date: $currentDateText \n"
+            //message += "Selected date is after current day: " + selectedDate.compareTo(currentDate) + "\n"
+            if(selectedDate.equals(currentDate) && (selectedHour < currentHour || (selectedHour == currentHour && selectedMinute < currentMinute))){
+                // wybrano czas przed aktualną chwilą
+                Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()
+                binding.buttonTime.setBackgroundColor(Color.RED)
+                binding.buttonDate.setBackgroundColor(Color.RED)
+            }
+            else{
+                message += "Time: $selectedHour:$selectedMinute \n"
+                binding.buttonTime.setBackgroundColor(Color.parseColor("#6200ee"))
+                binding.buttonDate.setBackgroundColor(Color.parseColor("#6200ee"))
+            }
+            //message += "Current Time: $currentHour:$currentMinute \n"
             if (binding.editTextTextPassengersNumber.text.isNotEmpty()){
                 message += "Passengers number: " + binding.editTextTextPassengersNumber.text + "\n"
             }
