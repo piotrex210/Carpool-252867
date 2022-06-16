@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         val myCalendar = Calendar.getInstance()
         var formatDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            SimpleDateFormat("dd MMMM YYYY", Locale.GERMANY)
+            SimpleDateFormat("dd MMMM YYYY", Locale.UK)
         } else {
             TODO("VERSION.SDK_INT < N")
         }
@@ -52,15 +53,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonDate.setOnClickListener {
             val datePicker = DatePickerDialog.OnDateSetListener { view, currentYear, currentMonth, currentDay ->
-                //myCalendar.set(Calendar.YEAR, currentYear) // ustawianie domyślnej daty
-                //myCalendar.set(Calendar.MONTH, currentMonth)
-                //myCalendar.set(Calendar.DAY_OF_MONTH, currentDay)
+                myCalendar.set(Calendar.YEAR, currentYear) // ustawianie domyślnej daty
+                myCalendar.set(Calendar.MONTH, currentMonth)
+                myCalendar.set(Calendar.DAY_OF_MONTH, currentDay)
                 selectedYear = myCalendar.get(Calendar.YEAR)
                 selectedMonth = myCalendar.get(Calendar.MONTH)
                 selectedDay = myCalendar.get(Calendar.DAY_OF_MONTH)
                 selectedDateText = formatDate.format(myCalendar.time)
                 selectedDate = myCalendar.time
-
                 Toast.makeText(applicationContext, "Selected date: $selectedDateText", Toast.LENGTH_SHORT).show()
             }
             val dpd = DatePickerDialog(this, datePicker, selectedYear, selectedMonth, selectedDay)
@@ -70,10 +70,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonTime.setOnClickListener {
            TimePickerDialog(this, TimePickerDialog.OnTimeSetListener{view, currentHour, currentMinute ->
-               //myCalendar.set(Calendar.HOUR_OF_DAY, currentHour)
-               //myCalendar.set(Calendar.MINUTE, currentMinute)
-               //selectedHour = myCalendar.get(Calendar.HOUR)
-               //selectedMinute = myCalendar.get(Calendar.MINUTE)
+               myCalendar.set(Calendar.HOUR_OF_DAY, currentHour)
+               myCalendar.set(Calendar.MINUTE, currentMinute)
+               selectedHour = myCalendar.get(Calendar.HOUR_OF_DAY)
+               selectedMinute = myCalendar.get(Calendar.MINUTE)
            }, selectedHour, selectedMinute, true ).show()
         }
 
@@ -94,12 +94,11 @@ class MainActivity : AppCompatActivity() {
             if(selectedDate.equals(currentDate) && (selectedHour < currentHour || (selectedHour == currentHour && selectedMinute < currentMinute))){
                 // wybrano czas przed aktualną chwilą
                 Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()
+                binding.buttonTime.setBackgroundColor(Color.RED)
             }
             else{
                 message += "Time: $selectedHour:$selectedMinute \n"
             }
-            message += "Time: $selectedHour:$selectedMinute \n"
-
             message += "Current Time: $currentHour:$currentMinute \n"
             if (binding.editTextTextPassengersNumber.text.isNotEmpty()){
                 message += "Passengers number: " + binding.editTextTextPassengersNumber.text + "\n"
