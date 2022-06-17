@@ -1,0 +1,81 @@
+package com.example.carpool_252867
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.os.Build
+import androidx.annotation.RequiresApi
+
+@RequiresApi(Build.VERSION_CODES.P)
+class DataBaseHelper: SQLiteOpenHelper {
+    constructor(context: Context?) :
+            super(context, "rides.db", null, 1)
+    val RIDES_TABLE = "RIDES_TABLE"
+    val COLUMN_ID = "ID"
+    val COLUMN_START_POINT = "START_POINT"
+    val COLUMN_DESTINATION_POINT = "DESTINATION_POINT"
+    val COLUMN_DATE = "DATE"
+    val COLUMN_TIME = "TIME"
+    val COLUMN_NUMBER_OF_PASSENGERS = "NUMBER_OF_PASSENGERS"
+    val COLUMN_PRICE_PER_SEAT = "PRICE_PER_SEAT"
+
+
+
+
+    override fun onCreate(db: SQLiteDatabase) {
+        val createTableStatment = "CREATE TABLE "+RIDES_TABLE+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_START_POINT+" TEXT, "+COLUMN_DESTINATION_POINT+" TEXT, "+COLUMN_DATE+" TEXT, "+COLUMN_TIME+" STRING," +
+                COLUMN_NUMBER_OF_PASSENGERS+" INTEGER, "+COLUMN_PRICE_PER_SEAT+" INTEGER)"
+        db.execSQL(createTableStatment)
+    }
+
+    override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
+        TODO("Not yet implemented")
+    }
+    public fun addOne(rideModel: RideModel): Boolean {
+        var db = this.writableDatabase // database
+        var cv = ContentValues()    // content value
+
+        cv.put(COLUMN_START_POINT, rideModel.startPoint)
+        cv.put(COLUMN_DESTINATION_POINT, rideModel.destinationPoint)
+        cv.put(COLUMN_DATE, rideModel.date)
+        cv.put(COLUMN_TIME, rideModel.time)
+        cv.put(COLUMN_NUMBER_OF_PASSENGERS, rideModel.numberOfPassengers)
+        cv.put(COLUMN_PRICE_PER_SEAT, rideModel.pricePerPassenger)
+
+        val succes = db.insert(RIDES_TABLE, null, cv)
+        return succes >= 0
+    }
+
+    public fun getAll(): List<RideModel>{
+        var returnList:ArrayList<RideModel> = ArrayList<RideModel>()
+
+        val queryString = "SELECT * FROM " + RIDES_TABLE
+        var db = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+
+        if(cursor.moveToFirst()){
+            do{
+                val rideID = cursor.getInt(0)
+                val startPoint = cursor.getString(1)
+                val destinationPoint = cursor.getString(2)
+                val date = cursor.getString(3)
+                val time = cursor.getString(4)
+                val numberOfPassengers = cursor.getInt(5)
+                val pricePerPassenger =  cursor.getInt(6)
+
+                val newRide = RideModel(rideID, startPoint, destinationPoint,
+                    date, time, numberOfPassengers, pricePerPassenger)
+                returnList.add(newRide)
+
+            }while(cursor.moveToNext())
+        }
+        else{
+            // do nothing
+        }
+        cursor.close()
+        db.close()
+        return returnList
+    }
+
+}

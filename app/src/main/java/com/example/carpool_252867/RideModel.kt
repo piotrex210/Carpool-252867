@@ -4,19 +4,19 @@ import java.sql.Time
 import java.util.*
 
 class RideModel{
-    private var id: Int
-    private var startPoint: String
-    private var destinationPoint: String
-    private var date: Date
-    private var time: String
-    private var numberOfPassengers: Int
-    private var pricePerPassenger: Int
+     var id: Int
+     var startPoint: String
+     var destinationPoint: String
+     var date: String
+     var time: String
+     var numberOfPassengers: Int
+     var pricePerPassenger: Int
 
     constructor(
         id: Int,
         startPoint: String,
         destinationPoint: String,
-        date: Date,
+        date: String,
         time: String,
         numberOfPassengers: Int,
         pricePerPassenger: Int
