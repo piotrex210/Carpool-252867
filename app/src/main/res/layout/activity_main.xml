@@ -108,14 +108,6 @@
             android:hint="Price per passenger"
             android:inputType="number" />
 
-        <TextView
-            android:id="@+id/textViewResultMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Result"
-            android:textSize="20sp" />
-
         <ListView
             android:id="@+id/listViewRides"
             android:layout_width="match_parent"
