@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -76,6 +77,13 @@ class DataBaseHelper: SQLiteOpenHelper {
         cursor.close()
         db.close()
         return returnList
+    }
+
+    public fun deleteErrors(){
+        val queryString = "DELETE FROM " + RIDES_TABLE + " WHERE " + COLUMN_DATE + " = 'error'"
+        var db = this.writableDatabase
+        db.delete(RIDES_TABLE, COLUMN_DATE+" = 'error'", null)
+        db.close()
     }
 
 }

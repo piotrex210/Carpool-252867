@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         dataBaseHelper = DataBaseHelper(applicationContext)
+        dataBaseHelper.deleteErrors()
         showRidesOnListViews()
 
         val myCalendar = Calendar.getInstance()
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonViewAll.setOnClickListener {
             val allRides = dataBaseHelper.getAll()
+            dataBaseHelper.deleteErrors()
             showRidesOnListViews()
         }
 
@@ -181,3 +183,6 @@ class MainActivity : AppCompatActivity() {
         binding.listViewRides.adapter = ridesArrayAdapter
     }
 }
+//todo - dodanie timestamp int do klasy Ridemodel,
+// zamiana daty i godziny na timestamp,
+// wyszukiwanie po dacie
