@@ -19,6 +19,7 @@ class DataBaseHelper: SQLiteOpenHelper {
     val COLUMN_TIME = "TIME"
     val COLUMN_NUMBER_OF_PASSENGERS = "NUMBER_OF_PASSENGERS"
     val COLUMN_PRICE_PER_SEAT = "PRICE_PER_SEAT"
+    val COLUMN_TIMESTAMP = "TIMESTAMP"
 
 
 
@@ -30,8 +31,8 @@ class DataBaseHelper: SQLiteOpenHelper {
         db.execSQL(createTableStatment)
     }
 
-    override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-        TODO("Not yet implemented")
+    override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
+
     }
     public fun addOne(rideModel: RideModel): Boolean {
         var db = this.writableDatabase // database
@@ -43,6 +44,7 @@ class DataBaseHelper: SQLiteOpenHelper {
         cv.put(COLUMN_TIME, rideModel.time)
         cv.put(COLUMN_NUMBER_OF_PASSENGERS, rideModel.numberOfPassengers)
         cv.put(COLUMN_PRICE_PER_SEAT, rideModel.pricePerPassenger)
+        cv.put(COLUMN_TIMESTAMP, rideModel.timestamp)
 
         val succes = db.insert(RIDES_TABLE, null, cv)
         return succes >= 0
@@ -64,9 +66,11 @@ class DataBaseHelper: SQLiteOpenHelper {
                 val time = cursor.getString(4)
                 val numberOfPassengers = cursor.getInt(5)
                 val pricePerPassenger =  cursor.getInt(6)
+                val timestamp =  cursor.getLong(7)
+
 
                 val newRide = RideModel(rideID, startPoint, destinationPoint,
-                    date, time, numberOfPassengers, pricePerPassenger)
+                    date, time, numberOfPassengers, pricePerPassenger, timestamp)
                 returnList.add(newRide)
 
             }while(cursor.moveToNext())
@@ -83,6 +87,19 @@ class DataBaseHelper: SQLiteOpenHelper {
         val queryString = "DELETE FROM " + RIDES_TABLE + " WHERE " + COLUMN_DATE + " = 'error'"
         var db = this.writableDatabase
         db.delete(RIDES_TABLE, COLUMN_DATE+" = 'error'", null)
+        db.close()
+    }
+
+    public fun deleteAllData(){
+        var db = this.writableDatabase
+        db.delete(RIDES_TABLE, "ID > 0", null)
+        db.close()
+    }
+
+    public fun alterTable(){
+        val queryString = "ALTER TABLE " + RIDES_TABLE + " ADD COLUMN " + COLUMN_TIMESTAMP + " INTEGER DEFAULT -1"
+        var db = this.writableDatabase
+        db.rawQuery(queryString,null)
         db.close()
     }
 

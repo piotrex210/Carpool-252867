@@ -11,6 +11,9 @@ class RideModel{
      var time: String
      var numberOfPassengers: Int
      var pricePerPassenger: Int
+     var timestamp: Long
+
+
 
     constructor(
         id: Int,
@@ -19,7 +22,8 @@ class RideModel{
         date: String,
         time: String,
         numberOfPassengers: Int,
-        pricePerPassenger: Int
+        pricePerPassenger: Int,
+        timestamp: Long
     ) {
         this.id = id
         this.startPoint = startPoint
@@ -28,11 +32,12 @@ class RideModel{
         this.time = time
         this.numberOfPassengers = numberOfPassengers
         this.pricePerPassenger = pricePerPassenger
+        this.timestamp = timestamp
     }
 
 
     override fun toString(): String {
-        return "RideModel(id=$id, startPoint='$startPoint', destinationPoint='$destinationPoint', date=$date, time=$time, numberOfPassengers=$numberOfPassengers, pricePerPassenger=$pricePerPassenger)"
+        return "RideModel(id=$id, startPoint='$startPoint', destinationPoint='$destinationPoint', date= "+ formatDateAndTime.format(Date(timestamp)) + " timestamp: " + timestamp +", numberOfPassengers=$numberOfPassengers, pricePerPassenger=$pricePerPassenger)"
     }
 
 }

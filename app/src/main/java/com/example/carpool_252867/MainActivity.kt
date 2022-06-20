@@ -17,14 +17,25 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.carpool_252867.databinding.ActivityMainBinding
 import java.lang.Exception
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.*
+import java.time.format.DateTimeFormatter
+
+var formatDateAndTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    SimpleDateFormat("dd MMMM YYYY, HH:mm", Locale.UK)
+} else {
+    TODO("VERSION.SDK_INT < N")
+}
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var ridesArrayAdapter:ArrayAdapter<RideModel>
+
+
+
     @SuppressLint("NewApi")
     lateinit var dataBaseHelper: DataBaseHelper
 
@@ -37,8 +48,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         dataBaseHelper = DataBaseHelper(applicationContext)
+        //dataBaseHelper.alterTable()
+        //dataBaseHelper.deleteAllData()
         dataBaseHelper.deleteErrors()
-        showRidesOnListViews()
+        //showRidesOnListViews()
 
         val myCalendar = Calendar.getInstance()
         var formatDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -46,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             TODO("VERSION.SDK_INT < N")
         }
+
 
         //val currentDay = myCalendar.get(Calendar.DAY_OF_MONTH)
         //var currentMonth = myCalendar.get(Calendar.MONTH)
@@ -62,6 +76,8 @@ class MainActivity : AppCompatActivity() {
         var selectedDate = myCalendar.time
         var currentDate = myCalendar.time
         var selectedTime = ""
+        var timestamp = Timestamp(myCalendar.timeInMillis)
+
 
         binding.buttonViewAll.setOnClickListener {
             val allRides = dataBaseHelper.getAll()
@@ -74,11 +90,11 @@ class MainActivity : AppCompatActivity() {
             try {
                 rideModel = RideModel(-1, binding.editTextTextStartPoint.text.toString(), binding.editTextTextDestinationPoint.text.toString(),
                 selectedDateText, selectedTime, Integer.parseInt(binding.editTextTextPassengersNumber.text.toString()),
-                    Integer.parseInt(binding.editTextTextPricePerPassenger.text.toString()))
+                    Integer.parseInt(binding.editTextTextPricePerPassenger.text.toString()), timestamp.time)
             }
             catch (e: Exception){
                 rideModel = RideModel(-1, "error", "error",
-                    "error", "error", -1, -1)
+                    "error", "error", -1, -1,-1)
                 Toast.makeText(applicationContext, "Error during creating RideModel!", Toast.LENGTH_LONG).show()
             }
 
@@ -93,12 +109,14 @@ class MainActivity : AppCompatActivity() {
                 myCalendar.set(Calendar.YEAR, currentYear) // ustawianie domyślnej daty
                 myCalendar.set(Calendar.MONTH, currentMonth)
                 myCalendar.set(Calendar.DAY_OF_MONTH, currentDay)
+                myCalendar.set(Calendar.SECOND, 0)
                 selectedYear = myCalendar.get(Calendar.YEAR)
                 selectedMonth = myCalendar.get(Calendar.MONTH)
                 selectedDay = myCalendar.get(Calendar.DAY_OF_MONTH)
                 selectedDateText = formatDate.format(myCalendar.time)
                 selectedDate = myCalendar.time
-                Toast.makeText(applicationContext, "Selected date: $selectedDateText", Toast.LENGTH_SHORT).show()
+                timestamp = Timestamp(myCalendar.timeInMillis)
+                Toast.makeText(applicationContext, "Selected date: $selectedDateText, timestamp: ${timestamp.time}", Toast.LENGTH_SHORT).show()
             }
             val dpd = DatePickerDialog(this, datePicker, selectedYear, selectedMonth, selectedDay)
             dpd.datePicker.minDate = System.currentTimeMillis() - 1000 // ustawianie minimalnej daty do wybrania
@@ -112,9 +130,13 @@ class MainActivity : AppCompatActivity() {
             TimePickerDialog(this, TimePickerDialog.OnTimeSetListener{view, currentHour, currentMinute ->
                 myCalendar.set(Calendar.HOUR_OF_DAY, currentHour)
                 myCalendar.set(Calendar.MINUTE, currentMinute)
+                myCalendar.set(Calendar.SECOND, 0)
                 selectedHour = myCalendar.get(Calendar.HOUR_OF_DAY)
                 selectedMinute = myCalendar.get(Calendar.MINUTE)
+                timestamp = Timestamp(myCalendar.timeInMillis)
                 selectedTime = "$selectedHour:$selectedMinute"
+                val str = formatDateAndTime.format(Date(timestamp.time))
+                Toast.makeText(applicationContext, str, Toast.LENGTH_LONG).show()
             }, selectedHour, selectedMinute, true ).show()
         }
 
