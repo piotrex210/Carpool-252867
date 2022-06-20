@@ -24,7 +24,7 @@ import java.util.*
 import java.time.format.DateTimeFormatter
 
 var formatDateAndTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-    SimpleDateFormat("dd MMMM YYYY, HH:mm", Locale.UK)
+    SimpleDateFormat("dd MMMM YYYY, HH:mm:ss.SSS", Locale.UK)
 } else {
     TODO("VERSION.SDK_INT < N")
 }
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         var selectedDate = myCalendar.time
         var currentDate = myCalendar.time
         var selectedTime = ""
-        var timestamp = Timestamp(myCalendar.timeInMillis)
+        var timestamp = Timestamp(myCalendar.timeInMillis - myCalendar.timeInMillis%60000)
 
 
         binding.buttonViewAll.setOnClickListener {
@@ -89,12 +89,12 @@ class MainActivity : AppCompatActivity() {
             var rideModel:RideModel
             try {
                 rideModel = RideModel(-1, binding.editTextTextStartPoint.text.toString(), binding.editTextTextDestinationPoint.text.toString(),
-                selectedDateText, selectedTime, Integer.parseInt(binding.editTextTextPassengersNumber.text.toString()),
+                 Integer.parseInt(binding.editTextTextPassengersNumber.text.toString()),
                     Integer.parseInt(binding.editTextTextPricePerPassenger.text.toString()), timestamp.time)
             }
             catch (e: Exception){
                 rideModel = RideModel(-1, "error", "error",
-                    "error", "error", -1, -1,-1)
+               -1, -1,-1)
                 Toast.makeText(applicationContext, "Error during creating RideModel!", Toast.LENGTH_LONG).show()
             }
 
@@ -110,13 +110,13 @@ class MainActivity : AppCompatActivity() {
                 myCalendar.set(Calendar.MONTH, currentMonth)
                 myCalendar.set(Calendar.DAY_OF_MONTH, currentDay)
                 myCalendar.set(Calendar.SECOND, 0)
-                selectedYear = myCalendar.get(Calendar.YEAR)
-                selectedMonth = myCalendar.get(Calendar.MONTH)
-                selectedDay = myCalendar.get(Calendar.DAY_OF_MONTH)
-                selectedDateText = formatDate.format(myCalendar.time)
+//                selectedYear = myCalendar.get(Calendar.YEAR)
+//                selectedMonth = myCalendar.get(Calendar.MONTH)
+//                selectedDay = myCalendar.get(Calendar.DAY_OF_MONTH)
+//                selectedDateText = formatDate.format(myCalendar.time)
                 selectedDate = myCalendar.time
-                timestamp = Timestamp(myCalendar.timeInMillis)
-                Toast.makeText(applicationContext, "Selected date: $selectedDateText, timestamp: ${timestamp.time}", Toast.LENGTH_SHORT).show()
+                timestamp = Timestamp(myCalendar.timeInMillis - myCalendar.timeInMillis%60000)
+                Toast.makeText(applicationContext, "Selected date: $timestamp", Toast.LENGTH_SHORT).show()
             }
             val dpd = DatePickerDialog(this, datePicker, selectedYear, selectedMonth, selectedDay)
             dpd.datePicker.minDate = System.currentTimeMillis() - 1000 // ustawianie minimalnej daty do wybrania
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 myCalendar.set(Calendar.SECOND, 0)
                 selectedHour = myCalendar.get(Calendar.HOUR_OF_DAY)
                 selectedMinute = myCalendar.get(Calendar.MINUTE)
-                timestamp = Timestamp(myCalendar.timeInMillis)
+                timestamp = Timestamp(myCalendar.timeInMillis - myCalendar.timeInMillis%60000)
                 selectedTime = "$selectedHour:$selectedMinute"
                 val str = formatDateAndTime.format(Date(timestamp.time))
                 Toast.makeText(applicationContext, str, Toast.LENGTH_LONG).show()
@@ -154,10 +154,7 @@ class MainActivity : AppCompatActivity() {
             if (binding.editTextTextDestinationPoint.text.isNotEmpty()){
                 message += "Destination point: " + binding.editTextTextDestinationPoint.text + "\n"
             }
-            message += "DateText: $selectedDateText \n"
-            //message += "Date values : $selectedYear $selectedMonth $selectedDay \n"
-            //message += "Current Date: $currentDateText \n"
-            //message += "Selected date is after current day: " + selectedDate.compareTo(currentDate) + "\n"
+            message += "DateText: ${formatDateAndTime.format(Date(timestamp.time))} \n"
             if(selectedDate.equals(currentDate) && (selectedHour < currentHour || (selectedHour == currentHour && selectedMinute < currentMinute))){
                 // wybrano czas przed aktualną chwilą
                 Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()

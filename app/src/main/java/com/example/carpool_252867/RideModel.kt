@@ -7,8 +7,6 @@ class RideModel{
      var id: Int
      var startPoint: String
      var destinationPoint: String
-     var date: String
-     var time: String
      var numberOfPassengers: Int
      var pricePerPassenger: Int
      var timestamp: Long
@@ -19,8 +17,6 @@ class RideModel{
         id: Int,
         startPoint: String,
         destinationPoint: String,
-        date: String,
-        time: String,
         numberOfPassengers: Int,
         pricePerPassenger: Int,
         timestamp: Long
@@ -28,8 +24,6 @@ class RideModel{
         this.id = id
         this.startPoint = startPoint
         this.destinationPoint = destinationPoint
-        this.date = date
-        this.time = time
         this.numberOfPassengers = numberOfPassengers
         this.pricePerPassenger = pricePerPassenger
         this.timestamp = timestamp

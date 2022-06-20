@@ -15,8 +15,6 @@ class DataBaseHelper: SQLiteOpenHelper {
     val COLUMN_ID = "ID"
     val COLUMN_START_POINT = "START_POINT"
     val COLUMN_DESTINATION_POINT = "DESTINATION_POINT"
-    val COLUMN_DATE = "DATE"
-    val COLUMN_TIME = "TIME"
     val COLUMN_NUMBER_OF_PASSENGERS = "NUMBER_OF_PASSENGERS"
     val COLUMN_PRICE_PER_SEAT = "PRICE_PER_SEAT"
     val COLUMN_TIMESTAMP = "TIMESTAMP"
@@ -26,7 +24,7 @@ class DataBaseHelper: SQLiteOpenHelper {
 
     override fun onCreate(db: SQLiteDatabase) {
         val createTableStatment = "CREATE TABLE "+RIDES_TABLE+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_START_POINT+" TEXT, "+COLUMN_DESTINATION_POINT+" TEXT, "+COLUMN_DATE+" TEXT, "+COLUMN_TIME+" STRING," +
+                COLUMN_START_POINT+" TEXT, "+COLUMN_DESTINATION_POINT+" TEXT, " +
                 COLUMN_NUMBER_OF_PASSENGERS+" INTEGER, "+COLUMN_PRICE_PER_SEAT+" INTEGER)"
         db.execSQL(createTableStatment)
     }
@@ -40,8 +38,6 @@ class DataBaseHelper: SQLiteOpenHelper {
 
         cv.put(COLUMN_START_POINT, rideModel.startPoint)
         cv.put(COLUMN_DESTINATION_POINT, rideModel.destinationPoint)
-        cv.put(COLUMN_DATE, rideModel.date)
-        cv.put(COLUMN_TIME, rideModel.time)
         cv.put(COLUMN_NUMBER_OF_PASSENGERS, rideModel.numberOfPassengers)
         cv.put(COLUMN_PRICE_PER_SEAT, rideModel.pricePerPassenger)
         cv.put(COLUMN_TIMESTAMP, rideModel.timestamp)
@@ -57,23 +53,21 @@ class DataBaseHelper: SQLiteOpenHelper {
         var db = this.readableDatabase
         val cursor = db.rawQuery(queryString, null)
 
-        if(cursor.moveToFirst()){
+        if(cursor.moveToLast()){
             do{
                 val rideID = cursor.getInt(0)
                 val startPoint = cursor.getString(1)
                 val destinationPoint = cursor.getString(2)
-                val date = cursor.getString(3)
-                val time = cursor.getString(4)
-                val numberOfPassengers = cursor.getInt(5)
-                val pricePerPassenger =  cursor.getInt(6)
-                val timestamp =  cursor.getLong(7)
+                val numberOfPassengers = cursor.getInt(3)
+                val pricePerPassenger =  cursor.getInt(4)
+                val timestamp =  cursor.getLong(5)
 
 
                 val newRide = RideModel(rideID, startPoint, destinationPoint,
-                    date, time, numberOfPassengers, pricePerPassenger, timestamp)
+                    numberOfPassengers, pricePerPassenger, timestamp)
                 returnList.add(newRide)
 
-            }while(cursor.moveToNext())
+            }while(cursor.moveToPrevious())
         }
         else{
             // do nothing
@@ -84,9 +78,9 @@ class DataBaseHelper: SQLiteOpenHelper {
     }
 
     public fun deleteErrors(){
-        val queryString = "DELETE FROM " + RIDES_TABLE + " WHERE " + COLUMN_DATE + " = 'error'"
+        val queryString = "DELETE FROM " + RIDES_TABLE + " WHERE " + COLUMN_ID + " = -1"
         var db = this.writableDatabase
-        db.delete(RIDES_TABLE, COLUMN_DATE+" = 'error'", null)
+        db.delete(RIDES_TABLE, COLUMN_ID+" = -1", null)
         db.close()
     }
 
