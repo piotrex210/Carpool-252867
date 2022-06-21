@@ -61,8 +61,37 @@ class DataBaseHelper: SQLiteOpenHelper {
                 val numberOfPassengers = cursor.getInt(3)
                 val pricePerPassenger =  cursor.getInt(4)
                 val timestamp =  cursor.getLong(5)
+                val newRide = RideModel(rideID, startPoint, destinationPoint,
+                    numberOfPassengers, pricePerPassenger, timestamp)
+                returnList.add(newRide)
+
+            }while(cursor.moveToPrevious())
+        }
+        else{
+            // do nothing
+        }
+        cursor.close()
+        db.close()
+        return returnList
+    }
+
+    public fun selectRidesWhere(start: String, dest:String, time:Long): List<RideModel>{
+        var returnList:ArrayList<RideModel> = ArrayList<RideModel>()
+        val queryString = "SELECT * FROM " + RIDES_TABLE + " WHERE " + COLUMN_START_POINT + "= '"+start+"' "+
+                "AND " + COLUMN_DESTINATION_POINT + " = '"+dest+"' AND " + COLUMN_TIMESTAMP + " >= "+time.toString()
+
+        var db = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
 
 
+        if(cursor.moveToLast()){
+            do{
+                val rideID = cursor.getInt(0)
+                val startPoint = cursor.getString(1)
+                val destinationPoint = cursor.getString(2)
+                val numberOfPassengers = cursor.getInt(3)
+                val pricePerPassenger =  cursor.getInt(4)
+                val timestamp =  cursor.getLong(5)
                 val newRide = RideModel(rideID, startPoint, destinationPoint,
                     numberOfPassengers, pricePerPassenger, timestamp)
                 returnList.add(newRide)
@@ -78,7 +107,7 @@ class DataBaseHelper: SQLiteOpenHelper {
     }
 
     public fun deleteErrors(){
-        val queryString = "DELETE FROM " + RIDES_TABLE + " WHERE " + COLUMN_ID + " = -1"
+        val queryString = "DELETE FROM " + RIDES_TABLE + " WHERE " + COLUMN_START_POINT + " = 'error'"
         var db = this.writableDatabase
         db.delete(RIDES_TABLE, COLUMN_ID+" = -1", null)
         db.close()
@@ -86,7 +115,7 @@ class DataBaseHelper: SQLiteOpenHelper {
 
     public fun deleteAllData(){
         var db = this.writableDatabase
-        db.delete(RIDES_TABLE, "ID > 0", null)
+        db.delete(RIDES_TABLE, "ID > -2", null)
         db.close()
     }
 

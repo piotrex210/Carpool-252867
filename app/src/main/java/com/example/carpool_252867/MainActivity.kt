@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.isDigitsOnly
 import com.example.carpool_252867.databinding.ActivityMainBinding
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         dataBaseHelper = DataBaseHelper(applicationContext)
         //dataBaseHelper.alterTable()
-        //dataBaseHelper.deleteAllData()
+        dataBaseHelper.deleteAllData()
         dataBaseHelper.deleteErrors()
         showRidesOnListViews()
 
@@ -75,7 +76,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonOffer.setOnClickListener {
             var rideModel:RideModel
-            if(timestamp.after(currentTimestamp)) { // jeśli wybrano dobrą datę
+            if(timestamp.after(currentTimestamp) && binding.editTextTextDestinationPoint.text.isNotEmpty() &&
+                binding.editTextTextStartPoint.text.isNotEmpty()  // jeśli wybrano dobrą datę, start i koniec
+                 && binding.editTextTextPricePerPassenger.text.isNotEmpty() &&
+                                    binding.editTextTextPricePerPassenger.text.isNotEmpty()) { // jeśli wybrano dobrą datę i resztę danych
                 try {
                     rideModel = RideModel(
                         -1,
@@ -104,10 +108,13 @@ class MainActivity : AppCompatActivity() {
                 binding.buttonTime.setBackgroundColor(Color.parseColor("#6200ee"))
                 binding.buttonDate.setBackgroundColor(Color.parseColor("#6200ee"))
             }
-            else{ // jeśli wybrano czas wcześniejszy niż teraz
+            else if(timestamp.before(currentTimestamp)){ // jeśli wybrano czas wcześniejszy niż teraz
                 Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()
                 binding.buttonTime.setBackgroundColor(Color.RED)
                 binding.buttonDate.setBackgroundColor(Color.RED)
+            }
+            else{
+                Toast.makeText(applicationContext, "Make sure You provided correct data!", Toast.LENGTH_LONG).show()
             }
 
         }
@@ -142,8 +149,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.buttonFind.setOnClickListener {
-            var message = ""
-            Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+
+            if(!timestamp.before(currentTimestamp) && binding.editTextTextDestinationPoint.text.isNotEmpty() &&
+                binding.editTextTextStartPoint.text.isNotEmpty() ) { // jeśli wybrano dobrą datę, start i koniec
+                    // && binding.editTextTextPricePerPassenger.text.isDigitsOnly() &&
+                //                    binding.editTextTextPricePerPassenger.text.isDigitsOnly()
+                showSelectedRidesOnListViews(start = binding.editTextTextStartPoint.text.toString(),
+                    dest = binding.editTextTextDestinationPoint.text.toString(), time = timestamp.time)
+                //Toast.makeText(applicationContext, "Sukces wyświetlania! start:"+binding.editTextTextStartPoint.text.toString()+
+                        //"dest="+binding.editTextTextDestinationPoint.text.toString()+ "time="+timestamp.time, Toast.LENGTH_LONG).show()
+            }
+            else{
+                //var message = "Porażka wyświetlania"
+                //Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+            }
+            Toast.makeText(applicationContext, "Timestamp: $timestamp, currentTimestamp: $currentTimestamp", Toast.LENGTH_LONG).show()
+
+
         }
         binding.editTextTextStartPoint.setOnClickListener {
 
@@ -174,7 +196,15 @@ class MainActivity : AppCompatActivity() {
         )
         binding.listViewRides.adapter = ridesArrayAdapter
     }
+    @SuppressLint("NewApi")
+    private fun showSelectedRidesOnListViews(start: String, dest: String, time: Long) {
+        ridesArrayAdapter = ArrayAdapter<RideModel>(
+            applicationContext,
+            R.layout.simple_list_item_1,
+            dataBaseHelper.selectRidesWhere(start, dest, time)
+        )
+        binding.listViewRides.adapter = ridesArrayAdapter
+    }
 }
-//todo - wyszukiwanie po dacie
-//- dodanie tabeli users i powiązanie FK z tabelą rideModels
+//todo -  dodanie tabeli users i powiązanie FK z tabelą rideModels
 //        - dodanie okna rejestracji i logowania
