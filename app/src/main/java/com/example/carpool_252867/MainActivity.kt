@@ -18,6 +18,8 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val REQUEST_LOGIN_ACTIVITY = 1
+
 var formatDateAndTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
     SimpleDateFormat("dd MMMM YYYY, HH:mm", Locale.UK)
 } else {
@@ -29,11 +31,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var ridesArrayAdapter:ArrayAdapter<RideModel>
 
+    var currentUserId = -1
+    lateinit var currentUser: UserModel
+
     @SuppressLint("NewApi")
     lateinit var dataBaseHelper: DataBaseHelper
 
     @SuppressLint("NewApi")
     @RequiresApi(Build.VERSION_CODES.N)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         dataBaseHelper = DataBaseHelper(applicationContext)
+
         //dataBaseHelper.alterTable()
         //dataBaseHelper.deleteAllData()
         dataBaseHelper.deleteErrors()
@@ -170,7 +177,8 @@ class MainActivity : AppCompatActivity() {
         }
         binding.loginRegisterButton.setOnClickListener {
             var userId: Int
-            //val intent = Intent()
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivityForResult(intent, REQUEST_LOGIN_ACTIVITY)
         }
 
 
@@ -187,6 +195,27 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+    }
+
+    @SuppressLint("NewApi")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_LOGIN_ACTIVITY && resultCode == RESULT_OK) {
+            var loginData = data?.extras?.getInt("UserId")
+            if (loginData != null) {
+                currentUserId = loginData
+            }
+            Toast.makeText(applicationContext, "UserId: $currentUserId", Toast.LENGTH_LONG)
+                .show()
+            currentUser = dataBaseHelper.getUserById(currentUserId)
+            binding.UsernameTextView.text =
+                binding.UsernameTextView.text.toString() + "${currentUser.login}"
+        }
+        else{
+            Toast.makeText(applicationContext, "Login data not found", Toast.LENGTH_LONG).show()
+
+        }
     }
 
     @SuppressLint("NewApi")

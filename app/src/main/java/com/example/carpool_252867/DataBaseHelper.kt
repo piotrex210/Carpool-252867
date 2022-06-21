@@ -29,7 +29,7 @@ class DataBaseHelper: SQLiteOpenHelper {
 
     override fun onCreate(db: SQLiteDatabase) {
         var createTableStatment = "CREATE TABLE "+USERS_TABLE+"("+COLUMN_USER_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_LOGIN+" TEXT, "+COLUMN_PASSWORD+" TEXT, " +COLUMN_TEL_NUM+" INTEGER)"
+                COLUMN_LOGIN+" TEXT UNIQUE, "+COLUMN_PASSWORD+" TEXT, " +COLUMN_TEL_NUM+" INTEGER)"
         db.execSQL(createTableStatment)
         createTableStatment = "CREATE TABLE "+RIDES_TABLE+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_START_POINT+" TEXT, "+COLUMN_DESTINATION_POINT+" TEXT, " +
@@ -83,6 +83,46 @@ class DataBaseHelper: SQLiteOpenHelper {
         cursor.close()
         db.close()
         return returnId
+    }
+
+    public fun getUserByLogin(login: String): UserModel{
+        val queryString = "SELECT * FROM "+USERS_TABLE+" WHERE "+COLUMN_LOGIN+" = '"+login+"'"
+        var db = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+        var returnUser: UserModel
+        if(cursor.moveToFirst()) {
+            val Id = cursor.getInt(0)
+            val login = cursor.getString(1)
+            val password = cursor.getString(2)
+            val tel_num = cursor.getInt(3)
+            returnUser = UserModel(Id, login, password, tel_num)
+        }
+        else{
+            returnUser = UserModel(-1, "error", "error", -1)
+        }
+        cursor.close()
+        db.close()
+        return returnUser
+    }
+
+    public fun getUserById(Id: Int): UserModel{
+        val queryString = "SELECT * FROM "+USERS_TABLE+" WHERE "+COLUMN_USER_ID+" = "+Id
+        var db = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+        var returnUser: UserModel
+        if(cursor.moveToFirst()) {
+            val Id = cursor.getInt(0)
+            val login = cursor.getString(1)
+            val password = cursor.getString(2)
+            val tel_num = cursor.getInt(3)
+            returnUser = UserModel(Id, login, password, tel_num)
+        }
+        else{
+            returnUser = UserModel(-1, "error", "error", -1)
+        }
+        cursor.close()
+        db.close()
+        return returnUser
     }
 
     public fun getAll(): List<RideModel>{
