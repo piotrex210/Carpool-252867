@@ -18,14 +18,25 @@ class DataBaseHelper: SQLiteOpenHelper {
     val COLUMN_NUMBER_OF_PASSENGERS = "NUMBER_OF_PASSENGERS"
     val COLUMN_PRICE_PER_SEAT = "PRICE_PER_SEAT"
     val COLUMN_TIMESTAMP = "TIMESTAMP"
+    val COLUMN_DRIVER_ID = "DRIVER_ID"
+    val COLUMN_PASSENGER_ID = "PASSENGER_ID"
 
-
-
+    val USERS_TABLE = "USERS_TABLE"
+    val COLUMN_USER_ID = "ID"
+    val COLUMN_LOGIN = "LOGIN"
+    val COLUMN_PASSWORD = "PASSWORD"
+    val COLUMN_TEL_NUM = "TEL_NUM"
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTableStatment = "CREATE TABLE "+RIDES_TABLE+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        var createTableStatment = "CREATE TABLE "+USERS_TABLE+"("+COLUMN_USER_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_LOGIN+" TEXT, "+COLUMN_PASSWORD+" TEXT, " +COLUMN_TEL_NUM+" INTEGER)"
+        db.execSQL(createTableStatment)
+        createTableStatment = "CREATE TABLE "+RIDES_TABLE+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_START_POINT+" TEXT, "+COLUMN_DESTINATION_POINT+" TEXT, " +
-                COLUMN_NUMBER_OF_PASSENGERS+" INTEGER, "+COLUMN_PRICE_PER_SEAT+" INTEGER)"
+                COLUMN_NUMBER_OF_PASSENGERS+" INTEGER, "+COLUMN_PRICE_PER_SEAT+" INTEGER, "+
+                COLUMN_TIMESTAMP+ " INTEGER, " + COLUMN_DRIVER_ID+" INTEGER, " + COLUMN_PASSENGER_ID + " INTEGER," +
+                "FOREIGN KEY ("+COLUMN_DRIVER_ID+") REFERENCES "+USERS_TABLE+"("+COLUMN_ID+"),"+
+                "FOREIGN KEY ("+COLUMN_PASSENGER_ID+") REFERENCES "+USERS_TABLE+"("+COLUMN_ID+"))"
         db.execSQL(createTableStatment)
     }
 
@@ -44,6 +55,34 @@ class DataBaseHelper: SQLiteOpenHelper {
 
         val succes = db.insert(RIDES_TABLE, null, cv)
         return succes >= 0
+    }
+
+    public fun addOne(userModel: UserModel): Boolean{
+        var db = this.writableDatabase // database
+        var cv = ContentValues()    // content value
+
+        cv.put(COLUMN_LOGIN, userModel.login)
+        cv.put(COLUMN_PASSWORD, userModel.password)
+        cv.put(COLUMN_TEL_NUM, userModel.tel_num)
+
+        val succes = db.insert(USERS_TABLE, null, cv)
+        return succes >= 0
+    }
+
+    public fun getLastAddedUserId(): Int{
+        val queryString = "SELECT * FROM "+USERS_TABLE
+        var db = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+        var returnId: Int
+        if(cursor.moveToLast()) {
+            returnId = cursor.getInt(0)
+        }
+        else{
+            returnId = -1
+        }
+        cursor.close()
+        db.close()
+        return returnId
     }
 
     public fun getAll(): List<RideModel>{

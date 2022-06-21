@@ -4,6 +4,7 @@ import android.R
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         dataBaseHelper = DataBaseHelper(applicationContext)
         //dataBaseHelper.alterTable()
-        dataBaseHelper.deleteAllData()
+        //dataBaseHelper.deleteAllData()
         dataBaseHelper.deleteErrors()
         showRidesOnListViews()
 
@@ -167,8 +168,9 @@ class MainActivity : AppCompatActivity() {
 
 
         }
-        binding.editTextTextStartPoint.setOnClickListener {
-
+        binding.loginRegisterButton.setOnClickListener {
+            var userId: Int
+            //val intent = Intent()
         }
 
 
@@ -206,5 +208,5 @@ class MainActivity : AppCompatActivity() {
         binding.listViewRides.adapter = ridesArrayAdapter
     }
 }
-//todo -  dodanie tabeli users i powiązanie FK z tabelą rideModels
-//        - dodanie okna rejestracji i logowania
+//todo -  dodanie okna rejestracji i logowania
+    //  ZMIANA KONSTRUKTORA DLA KLASY RIDES - DOŁĄCZENIE POLA DRIVER_ID
