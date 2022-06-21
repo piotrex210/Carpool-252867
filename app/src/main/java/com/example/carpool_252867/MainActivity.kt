@@ -4,27 +4,20 @@ import android.R
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.SyncStateContract.Helpers.update
 import android.widget.ArrayAdapter
-import android.widget.DatePicker
-import android.widget.TimePicker
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.example.carpool_252867.databinding.ActivityMainBinding
-import java.lang.Exception
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.*
-import java.time.format.DateTimeFormatter
 
 var formatDateAndTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-    SimpleDateFormat("dd MMMM YYYY, HH:mm:ss.SSS", Locale.UK)
+    SimpleDateFormat("dd MMMM YYYY, HH:mm", Locale.UK)
 } else {
     TODO("VERSION.SDK_INT < N")
 }
@@ -33,8 +26,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var ridesArrayAdapter:ArrayAdapter<RideModel>
-
-
 
     @SuppressLint("NewApi")
     lateinit var dataBaseHelper: DataBaseHelper
@@ -51,57 +42,74 @@ class MainActivity : AppCompatActivity() {
         //dataBaseHelper.alterTable()
         //dataBaseHelper.deleteAllData()
         dataBaseHelper.deleteErrors()
-        //showRidesOnListViews()
+        showRidesOnListViews()
 
         val myCalendar = Calendar.getInstance()
-        var formatDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        val formatDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             SimpleDateFormat("dd MMMM YYYY", Locale.UK)
         } else {
             TODO("VERSION.SDK_INT < N")
         }
 
-
-        //val currentDay = myCalendar.get(Calendar.DAY_OF_MONTH)
-        //var currentMonth = myCalendar.get(Calendar.MONTH)
-        //val currentYear = myCalendar.get(Calendar.YEAR)
-        val currentHour = myCalendar.get(Calendar.HOUR_OF_DAY)
-        val currentMinute = myCalendar.get(Calendar.MINUTE)
-        var selectedDay = myCalendar.get(Calendar.DAY_OF_MONTH)
-        var selectedMonth = myCalendar.get(Calendar.MONTH)
-        var selectedYear = myCalendar.get(Calendar.YEAR)
-        var selectedHour = myCalendar.get(Calendar.HOUR_OF_DAY)
-        var selectedMinute = myCalendar.get(Calendar.MINUTE)
-        var currentDateText = formatDate.format(myCalendar.time)
-        var selectedDateText  = formatDate.format(myCalendar.time)//= formatDate.format(myCalendar.time)
+        //val currentHour = myCalendar.get(Calendar.HOUR_OF_DAY)
+        //val currentMinute = myCalendar.get(Calendar.MINUTE)
+        val selectedDay = myCalendar.get(Calendar.DAY_OF_MONTH)
+        val selectedMonth = myCalendar.get(Calendar.MONTH)
+        val selectedYear = myCalendar.get(Calendar.YEAR)
+        val selectedHour = myCalendar.get(Calendar.HOUR_OF_DAY)
+        val selectedMinute = myCalendar.get(Calendar.MINUTE)
+        //var currentDateText = formatDate.format(myCalendar.time)
+        //var selectedDateText  = formatDate.format(myCalendar.time)//= formatDate.format(myCalendar.time)
         var selectedDate = myCalendar.time
-        var currentDate = myCalendar.time
-        var selectedTime = ""
+        //var currentDate = myCalendar.time
+        //var selectedTime = ""
+        val currentTimestamp = Timestamp(myCalendar.timeInMillis - myCalendar.timeInMillis%60000)
         var timestamp = Timestamp(myCalendar.timeInMillis - myCalendar.timeInMillis%60000)
 
 
         binding.buttonViewAll.setOnClickListener {
-            val allRides = dataBaseHelper.getAll()
+            //val allRides = dataBaseHelper.getAll()
             dataBaseHelper.deleteErrors()
             showRidesOnListViews()
         }
 
         binding.buttonOffer.setOnClickListener {
             var rideModel:RideModel
-            try {
-                rideModel = RideModel(-1, binding.editTextTextStartPoint.text.toString(), binding.editTextTextDestinationPoint.text.toString(),
-                 Integer.parseInt(binding.editTextTextPassengersNumber.text.toString()),
-                    Integer.parseInt(binding.editTextTextPricePerPassenger.text.toString()), timestamp.time)
+            if(timestamp.after(currentTimestamp)) { // jeśli wybrano dobrą datę
+                try {
+                    rideModel = RideModel(
+                        -1,
+                        binding.editTextTextStartPoint.text.toString(),
+                        binding.editTextTextDestinationPoint.text.toString(),
+                        Integer.parseInt(binding.editTextTextPassengersNumber.text.toString()),
+                        Integer.parseInt(binding.editTextTextPricePerPassenger.text.toString()),
+                        timestamp.time
+                    )
+                } catch (e: Exception) {
+                    rideModel = RideModel(
+                        -1, "error", "error",
+                        -1, -1, -1
+                    )
+                    Toast.makeText(
+                        applicationContext,
+                        "Error during creating RideModel!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                dataBaseHelper = DataBaseHelper(applicationContext)
+                val succes = dataBaseHelper.addOne(rideModel)
+                Toast.makeText(applicationContext, "Adding ride succes: $succes", Toast.LENGTH_LONG)
+                    .show()
+                showRidesOnListViews()
+                binding.buttonTime.setBackgroundColor(Color.parseColor("#6200ee"))
+                binding.buttonDate.setBackgroundColor(Color.parseColor("#6200ee"))
             }
-            catch (e: Exception){
-                rideModel = RideModel(-1, "error", "error",
-               -1, -1,-1)
-                Toast.makeText(applicationContext, "Error during creating RideModel!", Toast.LENGTH_LONG).show()
+            else{ // jeśli wybrano czas wcześniejszy niż teraz
+                Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()
+                binding.buttonTime.setBackgroundColor(Color.RED)
+                binding.buttonDate.setBackgroundColor(Color.RED)
             }
 
-            dataBaseHelper = DataBaseHelper(applicationContext)
-            val succes = dataBaseHelper.addOne(rideModel)
-            Toast.makeText(applicationContext,"Adding ride succes: $succes", Toast.LENGTH_LONG).show()
-            showRidesOnListViews()
         }
 
         binding.buttonDate.setOnClickListener {
@@ -110,10 +118,6 @@ class MainActivity : AppCompatActivity() {
                 myCalendar.set(Calendar.MONTH, currentMonth)
                 myCalendar.set(Calendar.DAY_OF_MONTH, currentDay)
                 myCalendar.set(Calendar.SECOND, 0)
-//                selectedYear = myCalendar.get(Calendar.YEAR)
-//                selectedMonth = myCalendar.get(Calendar.MONTH)
-//                selectedDay = myCalendar.get(Calendar.DAY_OF_MONTH)
-//                selectedDateText = formatDate.format(myCalendar.time)
                 selectedDate = myCalendar.time
                 timestamp = Timestamp(myCalendar.timeInMillis - myCalendar.timeInMillis%60000)
                 Toast.makeText(applicationContext, "Selected date: $timestamp", Toast.LENGTH_SHORT).show()
@@ -131,49 +135,18 @@ class MainActivity : AppCompatActivity() {
                 myCalendar.set(Calendar.HOUR_OF_DAY, currentHour)
                 myCalendar.set(Calendar.MINUTE, currentMinute)
                 myCalendar.set(Calendar.SECOND, 0)
-                selectedHour = myCalendar.get(Calendar.HOUR_OF_DAY)
-                selectedMinute = myCalendar.get(Calendar.MINUTE)
                 timestamp = Timestamp(myCalendar.timeInMillis - myCalendar.timeInMillis%60000)
-                selectedTime = "$selectedHour:$selectedMinute"
                 val str = formatDateAndTime.format(Date(timestamp.time))
                 Toast.makeText(applicationContext, str, Toast.LENGTH_LONG).show()
             }, selectedHour, selectedMinute, true ).show()
         }
 
-        binding.editTextTextStartPoint.setOnClickListener {
-
-        }
-
-
-
         binding.buttonFind.setOnClickListener {
             var message = ""
-            if (binding.editTextTextStartPoint.text.isNotEmpty()){
-                message += "Start point: " + binding.editTextTextStartPoint.text + "\n"
-            }
-            if (binding.editTextTextDestinationPoint.text.isNotEmpty()){
-                message += "Destination point: " + binding.editTextTextDestinationPoint.text + "\n"
-            }
-            message += "DateText: ${formatDateAndTime.format(Date(timestamp.time))} \n"
-            if(selectedDate.equals(currentDate) && (selectedHour < currentHour || (selectedHour == currentHour && selectedMinute < currentMinute))){
-                // wybrano czas przed aktualną chwilą
-                Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()
-                binding.buttonTime.setBackgroundColor(Color.RED)
-                binding.buttonDate.setBackgroundColor(Color.RED)
-            }
-            else{
-                message += "Time: $selectedHour:$selectedMinute \n"
-                binding.buttonTime.setBackgroundColor(Color.parseColor("#6200ee"))
-                binding.buttonDate.setBackgroundColor(Color.parseColor("#6200ee"))
-            }
-            //message += "Current Time: $currentHour:$currentMinute \n"
-            if (binding.editTextTextPassengersNumber.text.isNotEmpty()){
-                message += "Passengers number: " + binding.editTextTextPassengersNumber.text + "\n"
-            }
-            if (binding.editTextTextPricePerPassenger.text.isNotEmpty()){
-                message += "Price per passenger: " + binding.editTextTextPricePerPassenger.text + "\n"
-            }
             Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+        }
+        binding.editTextTextStartPoint.setOnClickListener {
+
         }
 
 
@@ -202,6 +175,6 @@ class MainActivity : AppCompatActivity() {
         binding.listViewRides.adapter = ridesArrayAdapter
     }
 }
-//todo - dodanie timestamp int do klasy Ridemodel,
-// zamiana daty i godziny na timestamp,
-// wyszukiwanie po dacie
+//todo - wyszukiwanie po dacie
+//- dodanie tabeli users i powiązanie FK z tabelą rideModels
+//        - dodanie okna rejestracji i logowania
