@@ -61,12 +61,15 @@ class LoginActivity : AppCompatActivity() {
                         dataBaseHelper.addOne(userModel)
                         val userId = dataBaseHelper.getLastAddedUserId()
                         Toast.makeText(applicationContext,"Registration succes! Id:$userId",Toast.LENGTH_LONG).show()
-//                        intent.putExtra("UserId", userId)
-//                        setResult(RESULT_OK, intent)
-//                        finish()
                     }
                 }
             }
+        }
+
+        binding.buttonBack.setOnClickListener {
+            intent.putExtra("UserId", -1)
+            setResult(RESULT_OK, intent)
+            finish()
         }
 
 

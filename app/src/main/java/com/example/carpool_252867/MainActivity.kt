@@ -208,13 +208,14 @@ class MainActivity : AppCompatActivity() {
             }
             Toast.makeText(applicationContext, "UserId: $currentUserId", Toast.LENGTH_LONG)
                 .show()
-            currentUser = dataBaseHelper.getUserById(currentUserId)
-            binding.UsernameTextView.text =
-                binding.UsernameTextView.text.toString() + "${currentUser.login}"
+            if(currentUserId != -1){ // jeśli zalogowano użytkownika
+                currentUser = dataBaseHelper.getUserById(currentUserId)
+                binding.UsernameTextView.text =
+                    binding.UsernameTextView.text.toString() + "${currentUser.login}"
+            }
         }
         else{
             Toast.makeText(applicationContext, "Login data not found", Toast.LENGTH_LONG).show()
-
         }
     }
 
@@ -237,5 +238,7 @@ class MainActivity : AppCompatActivity() {
         binding.listViewRides.adapter = ridesArrayAdapter
     }
 }
-//todo -  dodanie okna rejestracji i logowania
-    //  ZMIANA KONSTRUKTORA DLA KLASY RIDES - DOŁĄCZENIE POLA DRIVER_ID
+// todo -   ZMIANA KONSTRUKTORA DLA KLASY RIDES - DOŁĄCZENIE POLA DRIVER_ID
+// todo - po kliknięciu na ofertę zostaje ona przypisana do użytkownika driver i passenger
+// todo - aby móc oferować ride musisz być zalogowany
+// todo - wyświetlanie nowego okna z danymi użytkownika i listą jego ofert
