@@ -8,6 +8,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -186,6 +188,32 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, REQUEST_LOGIN_ACTIVITY)
         }
 
+        binding.listViewRides.setOnItemClickListener { parent, view, position, id ->
+            if(currentUserId != -1){
+                val selectedRide: RideModel = parent.getItemAtPosition(position) as RideModel
+                if(selectedRide.driverId != currentUserId){
+                    dataBaseHelper.assignPassengerToRide(selectedRide.id, currentUserId)
+                    Toast.makeText(applicationContext, "Succesful choosing ride!", Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    Toast.makeText(applicationContext, "You can not choose Your own ride!", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            else{
+                Toast.makeText(applicationContext,   "First log in to choose a ride!", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
+        binding.UsernameTextView.setOnClickListener(){
+            if(currentUserId != -1){
+                val intent = Intent(this, MyAccountActivity::class.java)
+                intent.putExtra("userId", currentUserId)
+                startActivity(intent)
+            }
+        }
+
 
 
 
@@ -242,5 +270,8 @@ class MainActivity : AppCompatActivity() {
         binding.listViewRides.adapter = ridesArrayAdapter
     }
 }
-// todo - po kliknięciu na ofertę zostaje ona przypisana do użytkownika driver i passenger
+
+
 // todo - wyświetlanie nowego okna z danymi użytkownika i listą jego ofert
+// todo - zmienny layout dla różnych rozmiarów wyświetlacza
+// todo - dokumentacja

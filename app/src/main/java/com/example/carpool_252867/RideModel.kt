@@ -56,7 +56,7 @@ class RideModel{
 
     override fun toString(): String {
         return "RideModel(id=$id, startPoint='$startPoint', destinationPoint='$destinationPoint', date= "+
-                formatDateAndTime.format(Date(timestamp)) + " timestamp: " + timestamp +", numberOfPassengers=$numberOfPassengers, " +
+                formatDateAndTime.format(Date(timestamp)) + ", numberOfPassengers=$numberOfPassengers, " +
                 "pricePerPassenger=$pricePerPassenger), driverId: $driverId, passengerId: $passengerId"
     }
 

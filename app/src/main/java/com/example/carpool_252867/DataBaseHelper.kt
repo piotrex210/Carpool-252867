@@ -190,11 +190,76 @@ class DataBaseHelper: SQLiteOpenHelper {
         db.close()
         return returnList
     }
+    public fun selectRidesWherePassengerId(passengerId: Int): List<RideModel>{
+        var returnList:ArrayList<RideModel> = ArrayList<RideModel>()
+        val queryString = "SELECT * FROM " + RIDES_TABLE + " WHERE " + COLUMN_PASSENGER_ID +" = "+ passengerId.toString()
+
+        var db = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+
+
+        if(cursor.moveToLast()){
+            do{
+                val rideID = cursor.getInt(0)
+                val startPoint = cursor.getString(1)
+                val destinationPoint = cursor.getString(2)
+                val numberOfPassengers = cursor.getInt(3)
+                val pricePerPassenger =  cursor.getInt(4)
+                val timestamp =  cursor.getLong(5)
+                val driverId = cursor.getInt(6)
+                val passengerId = cursor.getInt(7)
+                val newRide = RideModel(rideID, startPoint, destinationPoint,
+                    numberOfPassengers, pricePerPassenger, timestamp, driverId, passengerId)
+                returnList.add(newRide)
+
+            }while(cursor.moveToPrevious())
+        }
+        else{
+            // do nothing
+        }
+        cursor.close()
+        db.close()
+        return returnList
+    }
+    public fun selectRidesWhereDriverId(driverId: Int): List<RideModel>{
+        var returnList:ArrayList<RideModel> = ArrayList<RideModel>()
+        val queryString = "SELECT * FROM " + RIDES_TABLE + " WHERE " + COLUMN_DRIVER_ID +" = "+ driverId.toString()
+
+        var db = this.readableDatabase
+        val cursor = db.rawQuery(queryString, null)
+
+
+        if(cursor.moveToLast()){
+            do{
+                val rideID = cursor.getInt(0)
+                val startPoint = cursor.getString(1)
+                val destinationPoint = cursor.getString(2)
+                val numberOfPassengers = cursor.getInt(3)
+                val pricePerPassenger =  cursor.getInt(4)
+                val timestamp =  cursor.getLong(5)
+                val driverId = cursor.getInt(6)
+                val passengerId = cursor.getInt(7)
+                val newRide = RideModel(rideID, startPoint, destinationPoint,
+                    numberOfPassengers, pricePerPassenger, timestamp, driverId, passengerId)
+                returnList.add(newRide)
+
+            }while(cursor.moveToPrevious())
+        }
+        else{
+            // do nothing
+        }
+        cursor.close()
+        db.close()
+        return returnList
+    }
 
     public fun assignPassengerToRide(rideId: Int, passengerId: Int){
         var db = this.writableDatabase
-        val queryString = "UPDATE "+RIDES_TABLE+" SET "+ COLUMN_PASSENGER_ID +" = "+ passengerId+" WHERE "+COLUMN_ID+" = "+rideId
-        db.rawQuery(queryString, null)
+        //val queryString = "UPDATE "+RIDES_TABLE+" SET "+ COLUMN_PASSENGER_ID +" = "+ passengerId.toString()+" WHERE "+COLUMN_ID+" = "+rideId.toString()
+        //db.rawQuery(queryString, null)
+        var cv = ContentValues()
+        cv.put(COLUMN_PASSENGER_ID,passengerId)
+        db.update(RIDES_TABLE,cv, COLUMN_ID+" = "+rideId.toString(),null)
         db.close()
     }
 
@@ -217,5 +282,6 @@ class DataBaseHelper: SQLiteOpenHelper {
         db.rawQuery(queryString,null)
         db.close()
     }
+
 
 }
