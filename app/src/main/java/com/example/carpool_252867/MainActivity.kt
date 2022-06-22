@@ -87,7 +87,8 @@ class MainActivity : AppCompatActivity() {
             if(timestamp.after(currentTimestamp) && binding.editTextTextDestinationPoint.text.isNotEmpty() &&
                 binding.editTextTextStartPoint.text.isNotEmpty()  // jeśli wybrano dobrą datę, start i koniec
                  && binding.editTextTextPricePerPassenger.text.isNotEmpty() &&
-                                    binding.editTextTextPricePerPassenger.text.isNotEmpty()) { // jeśli wybrano dobrą datę i resztę danych
+                                    binding.editTextTextPricePerPassenger.text.isNotEmpty() && // jeśli wybrano dobrą datę i resztę danych
+                    currentUserId != -1) { // jeśli użytkownik jest zalogowany
                 try {
                     rideModel = RideModel(
                         -1,
@@ -95,12 +96,13 @@ class MainActivity : AppCompatActivity() {
                         binding.editTextTextDestinationPoint.text.toString(),
                         Integer.parseInt(binding.editTextTextPassengersNumber.text.toString()),
                         Integer.parseInt(binding.editTextTextPricePerPassenger.text.toString()),
-                        timestamp.time
+                        timestamp.time,
+                        currentUserId
                     )
                 } catch (e: Exception) {
                     rideModel = RideModel(
                         -1, "error", "error",
-                        -1, -1, -1
+                        -1, -1, -1, -1
                     )
                     Toast.makeText(
                         applicationContext,
@@ -115,6 +117,9 @@ class MainActivity : AppCompatActivity() {
                 showRidesOnListViews()
                 binding.buttonTime.setBackgroundColor(Color.parseColor("#6200ee"))
                 binding.buttonDate.setBackgroundColor(Color.parseColor("#6200ee"))
+            }
+            else if(currentUserId == -1){
+                Toast.makeText(applicationContext, "You have to log in to offer a ride!", Toast.LENGTH_LONG).show()
             }
             else if(timestamp.before(currentTimestamp)){ // jeśli wybrano czas wcześniejszy niż teraz
                 Toast.makeText(applicationContext, "Select later time, or different day!", Toast.LENGTH_LONG).show()
@@ -210,8 +215,7 @@ class MainActivity : AppCompatActivity() {
                 .show()
             if(currentUserId != -1){ // jeśli zalogowano użytkownika
                 currentUser = dataBaseHelper.getUserById(currentUserId)
-                binding.UsernameTextView.text =
-                    binding.UsernameTextView.text.toString() + "${currentUser.login}"
+                binding.UsernameTextView.text ="My Account:${currentUser.login}"
             }
         }
         else{
@@ -238,7 +242,5 @@ class MainActivity : AppCompatActivity() {
         binding.listViewRides.adapter = ridesArrayAdapter
     }
 }
-// todo -   ZMIANA KONSTRUKTORA DLA KLASY RIDES - DOŁĄCZENIE POLA DRIVER_ID
 // todo - po kliknięciu na ofertę zostaje ona przypisana do użytkownika driver i passenger
-// todo - aby móc oferować ride musisz być zalogowany
 // todo - wyświetlanie nowego okna z danymi użytkownika i listą jego ofert

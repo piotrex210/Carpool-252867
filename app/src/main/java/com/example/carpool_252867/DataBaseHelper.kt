@@ -52,6 +52,8 @@ class DataBaseHelper: SQLiteOpenHelper {
         cv.put(COLUMN_NUMBER_OF_PASSENGERS, rideModel.numberOfPassengers)
         cv.put(COLUMN_PRICE_PER_SEAT, rideModel.pricePerPassenger)
         cv.put(COLUMN_TIMESTAMP, rideModel.timestamp)
+        cv.put(COLUMN_DRIVER_ID, rideModel.driverId)
+        cv.put(COLUMN_PASSENGER_ID, rideModel.passengerId)
 
         val succes = db.insert(RIDES_TABLE, null, cv)
         return succes >= 0
@@ -140,8 +142,10 @@ class DataBaseHelper: SQLiteOpenHelper {
                 val numberOfPassengers = cursor.getInt(3)
                 val pricePerPassenger =  cursor.getInt(4)
                 val timestamp =  cursor.getLong(5)
+                val driverId = cursor.getInt(6)
+                val passengerId = cursor.getInt(7)
                 val newRide = RideModel(rideID, startPoint, destinationPoint,
-                    numberOfPassengers, pricePerPassenger, timestamp)
+                    numberOfPassengers, pricePerPassenger, timestamp, driverId, passengerId)
                 returnList.add(newRide)
 
             }while(cursor.moveToPrevious())
@@ -171,8 +175,10 @@ class DataBaseHelper: SQLiteOpenHelper {
                 val numberOfPassengers = cursor.getInt(3)
                 val pricePerPassenger =  cursor.getInt(4)
                 val timestamp =  cursor.getLong(5)
+                val driverId = cursor.getInt(6)
+                val passengerId = cursor.getInt(7)
                 val newRide = RideModel(rideID, startPoint, destinationPoint,
-                    numberOfPassengers, pricePerPassenger, timestamp)
+                    numberOfPassengers, pricePerPassenger, timestamp, driverId, passengerId)
                 returnList.add(newRide)
 
             }while(cursor.moveToPrevious())
@@ -183,6 +189,13 @@ class DataBaseHelper: SQLiteOpenHelper {
         cursor.close()
         db.close()
         return returnList
+    }
+
+    public fun assignPassengerToRide(rideId: Int, passengerId: Int){
+        var db = this.writableDatabase
+        val queryString = "UPDATE "+RIDES_TABLE+" SET "+ COLUMN_PASSENGER_ID +" = "+ passengerId+" WHERE "+COLUMN_ID+" = "+rideId
+        db.rawQuery(queryString, null)
+        db.close()
     }
 
     public fun deleteErrors(){
