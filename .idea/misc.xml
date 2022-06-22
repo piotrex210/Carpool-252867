@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Carpool252867/app/src/main/res/layout-land/activity_main.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Carpool252867/app/src/main/res/layout-small/activity_main.xml" value="0.7578947368421053" />
+        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Carpool252867/app/src/main/res/layout-xlarge/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Carpool252867/app/src/main/res/layout/activity_login.xml" value="0.3333333333333333" />
-        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Carpool252867/app/src/main/res/layout/activity_main.xml" value="0.31875" />
+        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Carpool252867/app/src/main/res/layout/activity_main.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Carpool252867/app/src/main/res/layout/activity_my_account.xml" value="0.3333333333333333" />
       </map>
     </option>

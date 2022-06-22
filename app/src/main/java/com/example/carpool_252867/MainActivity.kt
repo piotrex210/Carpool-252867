@@ -272,6 +272,4 @@ class MainActivity : AppCompatActivity() {
 }
 
 
-// todo - wyświetlanie nowego okna z danymi użytkownika i listą jego ofert
-// todo - zmienny layout dla różnych rozmiarów wyświetlacza
 // todo - dokumentacja
